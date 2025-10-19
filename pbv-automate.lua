@@ -39,7 +39,7 @@ local equipBrainrotActive = false
 local brainrotInterval = 60
 
 local TOGGLE_KEY = Enum.KeyCode.RightControl
-- Create GUI
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "AutoBuyGUI"
 ScreenGui.ResetOnSpawn = false
@@ -397,7 +397,7 @@ task.spawn(function()
             for _, gear in ipairs(gearList) do
                 if not buyingGearsActive then break end
                 
-                local buyDuration = math.random(30, 50) / 100 
+                local buyDuration = math.random(30, 50) / 100
                 local startTime = tick()
                 
                 while (tick() - startTime) < buyDuration do
