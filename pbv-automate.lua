@@ -6,8 +6,11 @@ local TweenService = game:GetService("TweenService")
 local function getSeedsList()
     local seeds = {}
     local seedsFolder = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Seeds")
+    local Util = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Utility"):WaitForChild("Util"))
+    
     for _, seed in ipairs(seedsFolder:GetChildren()) do
-        if seed:IsA("Folder") or seed:IsA("Model") then
+        local seedEntry = Util:GetSeedEntry(seed.Name)
+        if seedEntry and not seedEntry.Hidden then
             table.insert(seeds, seed.Name)
         end
     end
@@ -31,7 +34,7 @@ end
 local gearList = getGearsList()
 local seedList = getSeedsList()
 
-print("✓ Loaded " .. #seedList .. " seeds and " .. #gearList .. " gears from shop")
+print("> Loaded " .. #seedList .. " seeds and " .. #gearList .. " gears from shop")
 
 local buyingSeedsActive = false
 local buyingGearsActive = false
@@ -397,7 +400,8 @@ task.spawn(function()
             for _, gear in ipairs(gearList) do
                 if not buyingGearsActive then break end
                 
-                local buyDuration = math.random(30, 50) / 100
+                
+                local buyDuration = math.random(30, 50) / 100 
                 local startTime = tick()
                 
                 while (tick() - startTime) < buyDuration do
