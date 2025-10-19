@@ -3,8 +3,35 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
-local gearList = {"Water Bucket", "Frost Blower", "Frost Grenade", "Carrot Launcher", "Banana Gun"}
-local seedList = {"Cactus Seed", "Strawberry Seed", "Sunflower Seed", "Pumpkin Seed", "Dragon Fruit Seed", "Eggplant Seed", "Watermelon Seed", "Grape Seed", "Cocotank Seed", "Carnivorous Plant Seed", "Pine-a-Punch Seed", "Mr Carrot Seed", "Tomatrio Seed", "Shroombino Seed", "Mango Seed", "King Limone Seed"}
+local function getSeedsList()
+    local seeds = {}
+    local seedsFolder = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Seeds")
+    for _, seed in ipairs(seedsFolder:GetChildren()) do
+        if seed:IsA("Folder") or seed:IsA("Model") then
+            table.insert(seeds, seed.Name)
+        end
+    end
+    table.sort(seeds) 
+    return seeds
+end
+
+local function getGearsList()
+    local gears = {}
+    local gearsFolder = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Gears")
+    for _, gear in ipairs(gearsFolder:GetChildren()) do
+        if gear:GetAttribute("Price") then
+            table.insert(gears, gear.Name)
+        end
+    end
+    table.sort(gears) 
+    return gears
+end
+
+-- Configuration - Automatically updated from game
+local gearList = getGearsList()
+local seedList = getSeedsList()
+
+print("✓ Loaded " .. #seedList .. " seeds and " .. #gearList .. " gears from shop")
 
 local buyingSeedsActive = false
 local buyingGearsActive = false
@@ -12,7 +39,7 @@ local equipBrainrotActive = false
 local brainrotInterval = 60
 
 local TOGGLE_KEY = Enum.KeyCode.RightControl
-
+- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "AutoBuyGUI"
 ScreenGui.ResetOnSpawn = false
@@ -67,7 +94,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -85, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "PVB AUTO BUY"
+Title.Text = "PVB Auto Buy"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 17
 Title.Font = Enum.Font.GothamBold
@@ -340,16 +367,23 @@ task.spawn(function()
         if buyingSeedsActive then
             for _, seed in ipairs(seedList) do
                 if not buyingSeedsActive then break end
-                for i = 1, 30 do
+                
+                local buyDuration = math.random(30, 50) / 100 
+                local startTime = tick()
+                
+                while (tick() - startTime) < buyDuration do
                     if not buyingSeedsActive then break end
-                    pcall(function()
-                        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyItem"):FireServer(seed, true)
+                    task.spawn(function()
+                        pcall(function()
+                            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyItem"):FireServer(seed, true)
+                        end)
                     end)
-                    task.wait(0.02)
+                    task.wait(0.3) 
                 end
-            end
-            if not buyingSeedsActive then
-                task.wait(0.1)
+                
+                if buyingSeedsActive then
+                    task.wait(0.5)
+                end
             end
         else
             task.wait(0.1)
@@ -362,16 +396,23 @@ task.spawn(function()
         if buyingGearsActive then
             for _, gear in ipairs(gearList) do
                 if not buyingGearsActive then break end
-                for i = 1, 30 do
+                
+                local buyDuration = math.random(30, 50) / 100 
+                local startTime = tick()
+                
+                while (tick() - startTime) < buyDuration do
                     if not buyingGearsActive then break end
-                    pcall(function()
-                        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyGear"):FireServer(gear, true)
+                    task.spawn(function()
+                        pcall(function()
+                            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyGear"):FireServer(gear, true)
+                        end)
                     end)
-                    task.wait(0.02)
+                    task.wait(0.3) 
                 end
-            end
-            if not buyingGearsActive then
-                task.wait(0.1)
+                
+                if buyingGearsActive then
+                    task.wait(0.5)
+                end
             end
         else
             task.wait(0.1)
